@@ -4,9 +4,15 @@ blueprint:
   domain: automation
   source_url: https://github.com/antoniopacheco/presence_light/presence_light.yaml
   input:
+    motion_sensor:
+      name: Motion Sensor
+      description: This sensor will trigger the turning on of the target entity. Motion sensor is used for faster detection and turning the lights on.
+      selector:
+        entity:
+          domain: binary_sensor
     presence_entity:
       name: Presence Sensor
-      description: Presence sensor device
+      description: Presence sensor device - will keep the light on until the presence is not detected anymore. Better for detection of presence.
       selector:
         entity:
           domain: binary_sensor
@@ -72,9 +78,9 @@ max_exceeded: silent
 
 trigger:
   platform: state
-  entity_id: !input presence_entity
-  from: "off"
-  to: "on"
+  entity_id: !input 'motion_sensor'
+  from: 'off'
+  to: 'on'
 
 condition:
   - condition: numeric_state
@@ -88,7 +94,7 @@ action:
     data:
       brightness_pct: !input bright_percentage
 
-  - alias: "Wait until there is no motion from device"
+  - alias: "Wait until there is no presence detected from device"
     wait_for_trigger:
       platform: state
       entity_id: !input presence_entity
